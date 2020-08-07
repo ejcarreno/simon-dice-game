@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Simon Dice Game</title>
+  <link rel="icon" type="image/png" href="cerebro.png">
+
+<body>
+  <div class="center_title">
+    <h1>Simon Dice <span>Game</span></h1>
+  </div>
+  <footer>
+    <div class="footer_visible">
+      <p>Simon dice, es un juego de memoria que te ayuda a probar la retencion de información</p>
+    </div>
+    <div class="juntos_footer">
+      <div>
+        <p>copyright &copy; 2020 <a class="no_subrayar" href="https://ejcarreno16.github.io/portafolio/">EJCARRENO</a>
+        </p>
+  </footer>
+</body>
+<style>
+  body {
+    margin: 0;
+    background: #E8E8E8;
+    display: flex;
+    align-items: center;
+    height: 100vh;
+  }
+
+  .no_padding {
+    padding: 0;
+    margin: 0;
+  }
+
+  div .no_padding {
+    width: 10px;
+  }
+
+  .juntos_footer {
+    display: flex;
+    text-align: end;
+    margin: 0 0;
+    padding: 0;
+  }
+
+  .no_subrayar {
+    color: black;
+  }
+
+  .center_title {
+    align-items: center;
+    height: 100px;
+  }
+
+  footer div {
+    padding: 0;
+    margin: 0;
+  }
+
+  footer img {
+    width: 15px;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  a {
+    cursor: pointer;
+  }
+
+  h1 {
+    position: absolute;
+    top: 0;
+    right: 40%;
+    justify-content: center;
+    text-transform: uppercase;
+  }
+
+  footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    background-color: grey;
+  }
+
+  footer div {
+    align-items: center;
+    font-size: 10px;
+    padding: 0 5px;
+  }
+
+  h1 span {
+    color: red;
+  }
+
+  .gameboard {
+    height: 100vh;
+    width: 100vh;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0 auto;
+    max-height: 60vh;
+    max-width: 60vh;
+  }
+
+  .color {
+    width: 50%;
+    height: 50%;
+    display: inline-block;
+  }
+
+  .left {
+    float: left;
+  }
+
+  .right {
+    float: left;
+  }
+
+  .celeste {
+    background: #22a6b3;
+  }
+
+  .celeste.light {
+    background: #7ed6df;
+  }
+
+  .violeta {
+    background: #be2edd;
+  }
+
+  .violeta.light {
+    background: #e056fd;
+  }
+
+  .naranja {
+    background: #f0932b;
+  }
+
+  .naranja.light {
+    background: #ffbe76;
+  }
+
+  .verde {
+    background: #6ab04c;
+  }
+
+  .verde.light {
+    background: #badc58;
+  }
+
+  .btn-start {
+    width: 400px;
+    height: 100px;
+    background: #ecf0f1;
+    color: #2c3e50;
+    font-size: 2.5rem;
+    position: absolute;
+    top: calc(50% - 50px);
+    left: calc(50% - 200px);
+  }
+
+  .hide {
+    display: none;
+  }
+
+  * {
+    font-family: Arial, Helvetica, sans-serif;
+  }
+</style>
+</head>
+
+<body>
+  <div class="gameboard">
+    <div id="celeste" class="color celeste left" data-color="celeste"></div>
+    <div id="violeta" class="color violeta right" data-color="violeta"></div>
+    <div id="naranja" class="color naranja left" data-color="naranja"></div>
+    <div id="verde" class="color verde right" data-color="verde"></div>
+    <button id="btnEmpezar" class="btn-start" onclick="empezarJuego()">Empezar a jugar!</button>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+  <script>
+    const celeste = document.getElementById("celeste")
+    const violeta = document.getElementById("violeta")
+    const naranja = document.getElementById("naranja")
+    const verde = document.getElementById("verde")
+    const btnEmpezar = document.getElementById("btnEmpezar")
+    const ULTIMO_NIVEL = 10
+
+
+
+    class Juego {
+      constructor() {
+        this.inicializar = this.inicializar.bind(this)
+        this.inicializar()
+        this.generarSecuencia()
+        setTimeout(this.siguienteNivel, 500)
+
+      }
+
+      inicializar() {
+        this.elegirColor = this.elegirColor.bind(this)
+        this.siguienteNivel = this.siguienteNivel.bind(this)
+        this.toggleBtnEmpezar()
+        this.nivel = 1
+        this.colores = {
+          celeste,
+          violeta,
+          naranja,
+          verde
+        }
+      }
+
+      toggleBtnEmpezar() {
+        if (btnEmpezar.classList.contains("hide")) {
+          btnEmpezar.classList.remove("hide")
+        } else {
+          btnEmpezar.classList.add("hide")
+        }
+      }
+
+      generarSecuencia() {
+        this.secuencia = new Array(ULTIMO_NIVEL).fill(0).map(n => Math.floor(Math.random() * 4))
+      }
+
+      siguienteNivel() {
+        this.subNivel = 0
+        this.iluminarSecuencia()
+        this.agregarEventosClick()
+      }
+
+      trasformarNumeroAColor(numero) {
+        switch (numero) {
+          case 0:
+            return "celeste"
+          case 1:
+            return "violeta"
+          case 2:
+            return "naranja"
+          case 3:
+            return "verde"
+        }
+
+      }
+      trasformarColorANumero(color) {
+        switch (color) {
+          case "celeste":
+            return 0
+          case "violeta":
+            return 1
+          case "naranja":
+            return 2
+          case "verde":
+            return 3
+        }
+
+      }
+      iluminarSecuencia() {
+        for (let i = 0; i < this.nivel; i++) {
+          const color = this.trasformarNumeroAColor(this.secuencia[i])
+          setTimeout(() => this.iluminarColor(color), 1000 * i)
+        }
+      }
+
+      iluminarColor(color) {
+        this.colores[color].classList.add("light")
+        setTimeout(() => this.apagarColor(color), 350) // 352
+
+      }
+
+      apagarColor(color) {
+        this.colores[color].classList.remove("light")
+      }
+
+      agregarEventosClick() {
+        this.colores.celeste.addEventListener("click", this.elegirColor)
+        this.colores.verde.addEventListener("click", this.elegirColor)
+        this.colores.violeta.addEventListener("click", this.elegirColor)
+        this.colores.naranja.addEventListener("click", this.elegirColor)
+      }
+
+      eliminarEventosClick() {
+        this.colores.celeste.removeEventListener("click", this.elegirColor)
+        this.colores.verde.removeEventListener("click", this.elegirColor)
+        this.colores.violeta.removeEventListener("click", this.elegirColor)
+        this.colores.naranja.removeEventListener("click", this.elegirColor)
+      }
+
+      elegirColor(ev) {
+        const nombreColor = ev.target.dataset.color
+        const numeroColor = this.trasformarColorANumero(nombreColor)
+        this.iluminarColor(nombreColor)
+        if (numeroColor === this.secuencia[this.subNivel]) {
+          this.subNivel++
+
+
+          if (this.subNivel === this.nivel) {
+            this.nivel++
+            this.estaBien()
+            this.eliminarEventosClick()
+            if (this.nivel === (ULTIMO_NIVEL + 1)) {
+              this.ganoElJuego()
+
+            } else {
+              setTimeout(this.siguienteNivel, 2500)
+            }
+          }
+        } else {
+          this.perdioElJuego()
+        }
+
+      }
+
+      estaBien() {
+        swal("Bien, ¡ haz acertado en este nivel !")
+
+      }
+
+      ganoElJuego() {
+        swal("Platzi", "Felicitaciones, ganaste el juego!", "success")
+          .then(this.inicializar.bind("this"))
+
+
+      }
+
+      perdioElJuego() {
+        swal("Platzi", "Lo lamentamos, perdiste!", "error")
+          .then(() => {
+            this.eliminarEventosClick()
+            this.inicializar()
+          })
+
+      }
+    }
+
+
+    function empezarJuego() {
+      juego = new Juego()
+    }
+  </script>
+</body>
+
+</html>
+<!-- Simon Dice Game  ****EJCARRENO -->
